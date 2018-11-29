@@ -3,10 +3,9 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:awareframework_core/awareframework_core.dart';
 import 'package:flutter/material.dart';
-import 'package:charts_flutter/flutter.dart' as charts;
 
 /// init sensor
-class WifiSensor extends AwareSensorCore {
+class WiFiSensor extends AwareSensorCore {
   static const MethodChannel _wifiMethod = const MethodChannel('awareframework_wifi/method');
   static const EventChannel  _wifiStream  = const EventChannel('awareframework_wifi/event');
 
@@ -16,33 +15,42 @@ class WifiSensor extends AwareSensorCore {
   static const EventChannel  _onWiFiScanEndedStream   = const EventChannel('awareframework_wifi/event_on_wifi_scan_ended');
 
   /// Init Wifi Sensor with WifiSensorConfig
-  WifiSensor(WifiSensorConfig config):this.convenience(config);
-  WifiSensor.convenience(config) : super(config){
-    /// Set sensor method & event channels
-    super.setSensorChannels(_wifiMethod, _wifiStream);
+  WiFiSensor(WiFiSensorConfig config):this.convenience(config);
+  WiFiSensor.convenience(config) : super(config){
+    super.setMethodChannel(_wifiMethod);
   }
 
   /// A sensor observer instance
   Stream<Map<String,dynamic>> get onWiFiAPDetected {
-     return _onWiFiAPDetectedStream.receiveBroadcastStream(['on_wifi_ap_detected']).map((dynamic event) => Map<String,dynamic>.from(event));
+//     return _onWiFiAPDetectedStream.receiveBroadcastStream(['on_wifi_ap_detected']).map((dynamic event) => Map<String,dynamic>.from(event));
+    return super.getBroadcastStream(_onWiFiAPDetectedStream, 'on_wifi_ap_detected').map((dynamic event) => Map<String,dynamic>.from(event));
   }
 
   Stream<dynamic> get onWiFiDisabled {
-    return _onWiFiDisabledStream.receiveBroadcastStream(['on_wifi_disabled']);
+    // return _onWiFiDisabledStream.receiveBroadcastStream(['on_wifi_disabled']);
+    return super.getBroadcastStream(_onWiFiDisabledStream, 'on_wifi_disabled');
   }
 
   Stream<dynamic> get onWiFiScanStarted {
-    return _onWiFiScanStartedStream.receiveBroadcastStream(['on_wifi_scan_started']);
+    return super.getBroadcastStream(_onWiFiScanStartedStream, 'on_wifi_scan_started');
   }
 
   Stream<dynamic> get onWiFiScanEnded {
-    return _onWiFiScanEndedStream.receiveBroadcastStream(['on_wifi_scan_ended']);
+    return super.getBroadcastStream(_onWiFiScanEndedStream, 'on_wifi_scan_ended');
+  }
+
+  @override
+  void cancelAllEventChannels() {
+    super.cancelBroadcastStream('on_wifi_ap_detected');
+    super.cancelBroadcastStream('on_wifi_disabled');
+    super.cancelBroadcastStream('on_wifi_scan_started');
+    super.cancelBroadcastStream('on_wifi_scan_ended');
   }
 
 }
 
-class WifiSensorConfig extends AwareSensorConfig{
-  WifiSensorConfig();
+class WiFiSensorConfig extends AwareSensorConfig{
+  WiFiSensorConfig();
   @override
   Map<String, dynamic> toMap() {
     var map = super.toMap();
@@ -50,21 +58,22 @@ class WifiSensorConfig extends AwareSensorConfig{
   }
 }
 
+
 /// Make an AwareWidget
-class WifiCard extends StatefulWidget {
-  WifiCard({Key key, @required this.sensor}) : super(key: key);
+class WiFiCard extends StatefulWidget {
+  WiFiCard({Key key, @required this.sensor}) : super(key: key);
 
-  WifiSensor sensor;
-
-  @override
-  WifiCardState createState() => new WifiCardState();
-}
-
-
-class WifiCardState extends State<WifiCard> {
+  final WiFiSensor sensor;
 
   String data = "AP: unknown";
   String state = "state: unknown";
+
+  @override
+  WiFiCardState createState() => new WiFiCardState();
+}
+
+
+class WiFiCardState extends State<WiFiCard> {
 
   @override
   void initState() {
@@ -75,8 +84,8 @@ class WifiCardState extends State<WifiCard> {
       setState((){
         if(event!=null){
           DateTime.fromMicrosecondsSinceEpoch(event['timestamp']);
-          data = "AP: $event";
-          print(data);
+          widget.data = "AP: $event";
+          print(widget.data);
         }
       });
     }, onError: (dynamic error) {
@@ -85,19 +94,19 @@ class WifiCardState extends State<WifiCard> {
 
     widget.sensor.onWiFiDisabled.listen((event) {
       setState((){
-          state = "state: disabled";
+        widget.state = "state: disabled";
       });
     });
 
     widget.sensor.onWiFiScanEnded.listen((event) {
       setState((){
-        state = "state: scan end";
+        widget.state = "state: scan end";
       });
     });
 
     widget.sensor.onWiFiScanStarted.listen((event) {
       setState((){
-        state = "state: scan start";
+        widget.state = "state: scan start";
       });
     });
 
@@ -110,11 +119,18 @@ class WifiCardState extends State<WifiCard> {
     return new AwareCard(
       contentWidget: SizedBox(
           width: MediaQuery.of(context).size.width*0.8,
-          child: new Text("${state}\n${data}"),
+          child: new Text("${widget.state}\n${widget.data}"),
         ),
       title: "WiFi",
       sensor: widget.sensor
     );
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    widget.sensor.cancelAllEventChannels();
+    super.dispose();
   }
 
 }

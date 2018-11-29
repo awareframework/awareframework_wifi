@@ -5,16 +5,15 @@ import com_awareframework_ios_sensor_wifi
 import com_awareframework_ios_sensor_core
 import awareframework_core
 
-public class SwiftAwareframeworkWifiPlugin: AwareFlutterPluginCore, FlutterPlugin, AwareFlutterPluginSensorInitializationHandler, WifiObserver{
+public class SwiftAwareframeworkWifiPlugin: AwareFlutterPluginCore, FlutterPlugin, AwareFlutterPluginSensorInitializationHandler, WiFiObserver{
 
 
     public func initializeSensor(_ call: FlutterMethodCall, result: @escaping FlutterResult) -> AwareSensor? {
         if self.sensor == nil {
             if let config = call.arguments as? Dictionary<String,Any>{
-                let json = JSON.init(config)
-                self.wifiSensor = WifiSensor.init(WifiSensor.Config(json))
+                self.wifiSensor = WiFiSensor.init(WiFiSensor.Config(config))
             }else{
-                self.wifiSensor = WifiSensor.init(WifiSensor.Config())
+                self.wifiSensor = WiFiSensor.init(WiFiSensor.Config())
             }
             self.wifiSensor?.CONFIG.sensorObserver = self
             return self.wifiSensor
@@ -23,7 +22,7 @@ public class SwiftAwareframeworkWifiPlugin: AwareFlutterPluginCore, FlutterPlugi
         }
     }
 
-    var wifiSensor:WifiSensor?
+    var wifiSensor:WiFiSensor?
 
     public override init() {
         super.init()
@@ -34,21 +33,15 @@ public class SwiftAwareframeworkWifiPlugin: AwareFlutterPluginCore, FlutterPlugi
         
         let instance =  SwiftAwareframeworkWifiPlugin()
         
-        // add own channel
-        super.setChannels(with: registrar,
-                          instance: instance,
-                          methodChannelName: "awareframework_wifi/method",
-                          eventChannelName: "awareframework_wifi/event")
-        
-        let onWiFiAPDetectedStream  = FlutterEventChannel(name: "awareframework_wifi/event_on_wifi_ap_detected",  binaryMessenger: registrar.messenger())
-        let onWiFiScanStartedStream = FlutterEventChannel(name: "awareframework_wifi/event_on_wifi_scan_started", binaryMessenger: registrar.messenger())
-        let onWiFiDisabledStream    = FlutterEventChannel(name: "awareframework_wifi/event_on_wifi_disabled",     binaryMessenger: registrar.messenger())
-        let onWiFiScanEndedStream   = FlutterEventChannel(name: "awareframework_wifi/event_on_wifi_scan_ended",   binaryMessenger: registrar.messenger())
-        
-        onWiFiDisabledStream.setStreamHandler(instance)
-        onWiFiScanStartedStream.setStreamHandler(instance)
-        onWiFiAPDetectedStream.setStreamHandler(instance)
-        onWiFiScanEndedStream.setStreamHandler(instance)
+        super.setMethodChannel(with: registrar, instance: instance, channelName:  "awareframework_wifi/method")
+        super.setEventChannels(with: registrar, instance: instance, channelNames:
+            [
+                "awareframework_wifi/event",
+                "awareframework_wifi/event_on_wifi_ap_detected",
+                "awareframework_wifi/event_on_wifi_scan_started",
+                "awareframework_wifi/event_on_wifi_disabled",
+                "awareframework_wifi/event_on_wifi_scan_ended"
+            ])
     }
     
     public func onWiFiAPDetected(data: WiFiScanData) {

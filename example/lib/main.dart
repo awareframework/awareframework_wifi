@@ -1,9 +1,5 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-
-import 'package:flutter/services.dart';
 import 'package:awareframework_wifi/awareframework_wifi.dart';
-import 'package:awareframework_core/awareframework_core.dart';
 
 void main() => runApp(new MyApp());
 
@@ -14,17 +10,19 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
-  WifiSensor sensor;
-  WifiSensorConfig config;
+  WiFiSensor sensor;
+  WiFiSensorConfig config;
 
   @override
   void initState() {
     super.initState();
 
-    config = WifiSensorConfig()
+    config = WiFiSensorConfig()
       ..debug = true;
 
-    sensor = new WifiSensor(config);
+    sensor = new WiFiSensor(config);
+
+    sensor.start();
 
   }
 
@@ -37,7 +35,7 @@ class _MyAppState extends State<MyApp> {
           appBar: new AppBar(
             title: const Text('Plugin Example App'),
           ),
-          body: new WifiCard(sensor: sensor,)
+          body: new WiFiCard(sensor: sensor,)
       ),
     );
   }
