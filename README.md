@@ -1,6 +1,8 @@
-# Aware Wifi
+# Aware WiFi
 
-TODO
+[![Build Status](https://travis-ci.org/awareframework/awareframework_wifi.svg?branch=master)](https://travis-ci.org/awareframework/awareframework_wifi)
+
+This sensor allows us to handle WiFi conditions and events.
 
 ## Install the plugin into project
 1. Edit `pubspec.yaml`
@@ -21,10 +23,11 @@ import 'package:awareframework_core/awareframework_core.dart';
 ### wifi Sensor
 - `start()`
 - `stop()` 
-- `sync(force: Boolean)`
+- `sync(bool force)`
 - `enable()`
 - `disable()`
 - `isEnable()`
+- `setLabel(String label)`
 
 ### Configuration Keys
 TODO
@@ -52,14 +55,14 @@ var config = WifiSensorConfig()
   ..label = "label";
 
 // init sensor
-var sensor = new WifiSensor(config);
+var sensor = new WifiSensor.init(config);
 
-void mathod(){
+void method(){
     /// start 
     sensor.start();
     
     /// set observer
-    sensor.onDataChanged.listen((Map<String,dynamic> result){
+    sensor.onWiFiAPDetected.listen((data){
       setState((){
         // Your code here
       });

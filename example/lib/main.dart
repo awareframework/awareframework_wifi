@@ -20,7 +20,7 @@ class _MyAppState extends State<MyApp> {
     config = WiFiSensorConfig()
       ..debug = true;
 
-    sensor = new WiFiSensor(config);
+    sensor = new WiFiSensor.init(config);
 
     sensor.start();
 
