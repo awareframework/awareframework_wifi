@@ -9,34 +9,27 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
-  WiFiSensor sensor;
-  WiFiSensorConfig config;
+  WiFiSensor? sensor;
+  WiFiSensorConfig? config;
 
   @override
   void initState() {
     super.initState();
 
-    config = WiFiSensorConfig()
-      ..debug = true;
+    config = WiFiSensorConfig()..debug = true;
 
-    sensor = new WiFiSensor.init(config);
+    sensor = new WiFiSensor.init(config!);
 
-    sensor.start();
-
+    sensor?.start();
   }
 
   @override
   Widget build(BuildContext context) {
-
-
     return new MaterialApp(
       home: new Scaffold(
           appBar: new AppBar(
-            title: const Text('Plugin Example App'),
-          ),
-          body: new WiFiCard(sensor: sensor,)
-      ),
+        title: const Text('Plugin Example App'),
+      )),
     );
   }
 }
