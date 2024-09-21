@@ -187,10 +187,14 @@ class WiFiSensor extends AwareSensor {
 ///   ..frequency = 100;
 /// ```
 class WiFiSensorConfig extends AwareSensorConfig {
+  double interval = 1.0;
+
   WiFiSensorConfig();
+
   @override
   Map<String, dynamic> toMap() {
     var map = super.toMap();
+    map['interval'] = interval;
     return map;
   }
 }

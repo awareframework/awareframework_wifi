@@ -3,7 +3,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'awareframework_wifi'
-  s.version = '0.0.4'
+  s.version          = '0.7.2'
   s.summary          = 'A new flutter plugin project.'
   s.description      = <<-DESC
 A new flutter plugin project.
@@ -16,8 +16,8 @@ A new flutter plugin project.
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
   s.dependency 'awareframework_core'
-  s.dependency 'com.awareframework.ios.sensor.wifi', '~>0.4.0'
+  s.dependency 'com.awareframework.ios.sensor.wifi', '~>0.7'
 
-  s.ios.deployment_target = '10.0'
+  s.ios.deployment_target = '13.0'
 end
 

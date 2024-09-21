@@ -17,10 +17,15 @@ class _MyAppState extends State<MyApp> {
     super.initState();
 
     config = WiFiSensorConfig()..debug = true;
+    config?.interval = 1.0 / 60.0;
 
     sensor = new WiFiSensor.init(config!);
 
     sensor?.start();
+
+    sensor?.onWiFiAPDetected.listen((device) {
+      print(device);
+    });
   }
 
   @override
